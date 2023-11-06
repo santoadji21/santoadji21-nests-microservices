@@ -1,0 +1,95 @@
+version: '3.8'
+
+services:
+  reservations:
+    build:
+      context: .
+      dockerfile: ./apps/reservations/Dockerfile
+      target: development
+    container_name: sleeper-reservation
+    command: pnpm run start:dev reservations
+    ports:
+      - '3001:3000'
+    env_file:
+      - ./apps/reservations/.env
+    volumes:
+      - .:/usr/src/app
+    depends_on:
+      - mongo
+    networks:
+      - sleeper-network
+
+  auth:
+    build:
+      context: .
+      dockerfile: ./apps/auth/Dockerfile
+      target: development
+    container_name: sleeper-auth
+    command: pnpm run start:dev auth
+    ports:
+      - '3002:3000'
+    env_file:
+      - ./apps/auth/.env
+    volumes:
+      - .:/usr/src/app
+    depends_on:
+      - mongo
+    networks:
+      - sleeper-network
+
+  payments:
+    build:
+      context: .
+      dockerfile: ./apps/payments/Dockerfile
+      target: development
+    container_name: sleeper-payments
+    command: pnpm run start:dev payments
+    ports:
+      - '3003:3000'
+    env_file:
+      - ./apps/payments/.env
+    volumes:
+      - .:/usr/src/app
+    depends_on:
+      - mongo
+    networks:
+      - sleeper-network
+
+  notifications:
+    build:
+      context: .
+      dockerfile: ./apps/notifications/Dockerfile
+      target: development
+    container_name: sleeper-notifications
+    command: pnpm run start:dev notifications
+    ports:
+      - '3004:3000'
+    env_file:
+      - ./apps/notifications/.env
+    volumes:
+      - .:/usr/src/app
+    depends_on:
+      - mongo
+    networks:
+      - sleeper-network
+
+  mongo:
+    image: mongo
+    container_name: mongo
+    ports:
+      - '27017:27017'
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=example
+    volumes:
+      - mongo-data:/data/db
+    networks:
+      - sleeper-network
+
+networks:
+  sleeper-network:
+    driver: bridge
+
+volumes:
+  mongo-data:
+    driver: local
