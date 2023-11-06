@@ -20,18 +20,11 @@ export class PaymentsService {
     },
   );
 
-  async createCharge({ card, amount, email }: PaymentsCreateChargeDto) {
+  async createCharge({ amount, email }: PaymentsCreateChargeDto) {
     try {
-      const paymentMethod = await this.stripe.paymentMethods.create({
-        type: 'card',
-        card,
-      });
-
       const paymentIntent = await this.stripe.paymentIntents.create({
-        payment_method: paymentMethod.id,
+        payment_method: 'pm_card_visa',
         amount: amount * 100,
-        confirm: true,
-        payment_method_types: ['card'],
         currency: 'usd',
       });
 
@@ -39,15 +32,8 @@ export class PaymentsService {
         email,
         text: `Your payment of $${amount} has completed successfully.`,
       });
-
-      console.log('paymentIntent');
-      console.log(paymentIntent);
-
       return paymentIntent;
     } catch (error) {
-      console.log('error');
-      console.log(error);
-      console.error(error);
       throw new Error('Error creating payment intent');
     }
   }

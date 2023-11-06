@@ -7,6 +7,8 @@ WORKDIR /usr/src/app
 # Copy package.json and package-lock.json to the container
 COPY package*.json ./
 COPY pnpm-lock.yaml ./
+COPY tsconfig.json tsconfig.json
+COPY nest-cli.json nest-cli.json
 
 # Install pnpm
 RUN npm install -g pnpm
@@ -15,10 +17,11 @@ RUN npm install -g pnpm
 RUN pnpm install
 
 # Copy the source code to the container
-COPY . .
+COPY apps/reservations apps/reservations
+COPY libs libs
 
 # Build the application
-RUN pnpm run build
+RUN pnpm run build reservations
 
 # Stage 2: Production the application
 FROM node:20-alpine as production
@@ -39,9 +42,6 @@ RUN npm install -g pnpm
 
 # Install dependencies
 RUN pnpm install --prod
-
-# Copy the source code to the container
-COPY . .
 
 # Copy the builded application from development stage
 COPY --from=development /usr/src/app/dist ./dist

@@ -22,7 +22,6 @@ export class ReservationsService {
       .send('create_charge', {
         ...createReservationDto.charge,
         email,
-        userId,
       })
       .pipe(
         map((res) => {
